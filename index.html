@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Clone</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-info">
+            <h1>Tetris</h1>
+            <div class="score-container">
+                <p>Score: <span id="score">0</span></p>
+                <p>Lines: <span id="lines">0</span></p>
+                <p>Level: <span id="level">1</span></p>
+            </div>
+            <div class="hold-piece-container">
+                <p>Hold:</p>
+                <div id="hold-piece"></div>
+            </div>
+            <div class="next-piece-container">
+                <p>Next:</p>
+                <div id="next-piece"></div>
+            </div>
+            <div class="controls">
+                <p>Controls:</p>
+                <p>← → : Move left/right</p>
+                <p>↑ : Hard drop</p>
+                <p>↓ : Soft drop</p>
+                <p>Space : Rotate</p>
+                <p>C : Hold piece</p>
+                <p>P : Pause</p>
+            </div>
+            <button id="start-button">Start / Pause</button>
+        </div>
+        <div class="game-container">
+            <canvas id="game-board" width="300" height="480"></canvas>
+        </div>
+    </div>
+    <script src="tetris.js"></script>
+</body>
+</html>
