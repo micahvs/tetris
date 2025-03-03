@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Canvas setup
     const canvas = document.getElementById('game-board');
     canvas.width = 300;
-    canvas.height = 480; // Reduced from 600 to 480
+    canvas.height = 480;
     const ctx = canvas.getContext('2d');
     
     const nextPieceCanvas = document.createElement('canvas');
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('hold-piece').appendChild(holdPieceCanvas);
 
     // Game constants
-    const BLOCK_SIZE = 24; // Reduced from 30 to 24
+    const BLOCK_SIZE = 24;
     const BOARD_WIDTH = 10;
     const BOARD_HEIGHT = 20;
     const COLORS = [
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // Game variables
-    let board = createBoard();
+    let board = [];
     let score = 0;
     let lines = 0;
     let level = 1;
@@ -56,16 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameOver = false;
     let isPaused = false;
     let animationId;
-    let currentPiece = null;
     let nextPiece = null;
-    let holdPiece = null;
+    let heldPiece = null; // renamed from holdPiece to heldPiece
     let canHold = true;
 
     // Player variables
     const player = {
         pos: { x: 0, y: 0 },
-        piece: null,
-        score: 0
+        piece: null
     };
 
     // DOM elements
@@ -87,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateScore();
         gameOver = false;
         isPaused = false;
-        holdPiece = null;
+        heldPiece = null; // renamed
         canHold = true;
         drawHoldPiece();
         generateNewPiece();
@@ -229,12 +227,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function holdPiece() {
         if (!canHold) return;
         
-        if (holdPiece === null) {
-            holdPiece = player.piece;
+        if (heldPiece === null) {
+            heldPiece = player.piece;
             generateNewPiece();
         } else {
-            const temp = holdPiece;
-            holdPiece = player.piece;
+            const temp = heldPiece;
+            heldPiece = player.piece;
             player.piece = temp;
             player.pos.x = Math.floor(BOARD_WIDTH / 2) - Math.floor(SHAPES[player.piece][0].length / 2);
             player.pos.y = 0;
@@ -245,8 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // If still colliding, try to place it higher
                 if (checkCollision()) {
                     // Revert the swap if it's still colliding
-                    player.piece = holdPiece;
-                    holdPiece = temp;
+                    player.piece = heldPiece;
+                    heldPiece = temp;
                     return;
                 }
             }
@@ -262,9 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
         holdPieceCtx.fillStyle = '#1a1a2e';
         holdPieceCtx.fillRect(0, 0, holdPieceCanvas.width, holdPieceCanvas.height);
         
-        if (holdPiece === null) return;
+        if (heldPiece === null) return;
         
-        const shape = SHAPES[holdPiece];
+        const shape = SHAPES[heldPiece];
         const blockSize = 18; // Reduced from 20
         
         // Center the piece in the preview canvas
