@@ -46,18 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // Game variables
-    let board = [];
+    let board = createBoard();
     let score = 0;
     let lines = 0;
     let level = 1;
-    let dropInterval = 1000; // ms
+    let dropInterval = 1000;
     let lastTime = 0;
     let dropCounter = 0;
     let gameOver = false;
     let isPaused = false;
     let animationId;
     let nextPiece = null;
-    let heldPiece = null; // renamed from holdPiece to heldPiece
+    let savedPiece = null; // Using a completely different name
     let canHold = true;
 
     // Player variables
@@ -76,6 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', handleKeyPress);
     startButton.addEventListener('click', toggleGame);
 
+    // Create empty game board
+    function createBoard() {
+        return Array.from(Array(BOARD_HEIGHT), () => Array(BOARD_WIDTH).fill(0));
+    }
+
+    // Generate a random piece
+    function getRandomPiece() {
+        return Math.floor(Math.random() * 7) + 1;
+    }
+
     // Game initialization
     function init() {
         board = createBoard();
@@ -85,21 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateScore();
         gameOver = false;
         isPaused = false;
-        heldPiece = null; // renamed
+        savedPiece = null;
         canHold = true;
         drawHoldPiece();
         generateNewPiece();
         draw();
-    }
-
-    // Create empty game board
-    function createBoard() {
-        return Array.from(Array(BOARD_HEIGHT), () => Array(BOARD_WIDTH).fill(0));
-    }
-
-    // Generate a random piece
-    function getRandomPiece() {
-        return Math.floor(Math.random() * 7) + 1;
     }
 
     // Generate new piece for the player
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextPieceCtx.fillRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
         
         const shape = SHAPES[nextPiece];
-        const blockSize = 18; // Reduced from 20
+        const blockSize = 18;
         
         // Center the piece in the preview canvas
         const offsetX = (nextPieceCanvas.width - shape[0].length * blockSize) / 2;
@@ -224,15 +224,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Hold the current piece
-    function holdPiece() {
+    function saveCurrentPiece() {
         if (!canHold) return;
         
-        if (heldPiece === null) {
-            heldPiece = player.piece;
+        if (savedPiece === null) {
+            savedPiece = player.piece;
             generateNewPiece();
         } else {
-            const temp = heldPiece;
-            heldPiece = player.piece;
+            const temp = savedPiece;
+            savedPiece = player.piece;
             player.piece = temp;
             player.pos.x = Math.floor(BOARD_WIDTH / 2) - Math.floor(SHAPES[player.piece][0].length / 2);
             player.pos.y = 0;
@@ -243,8 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // If still colliding, try to place it higher
                 if (checkCollision()) {
                     // Revert the swap if it's still colliding
-                    player.piece = heldPiece;
-                    heldPiece = temp;
+                    player.piece = savedPiece;
+                    savedPiece = temp;
                     return;
                 }
             }
@@ -260,10 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
         holdPieceCtx.fillStyle = '#1a1a2e';
         holdPieceCtx.fillRect(0, 0, holdPieceCanvas.width, holdPieceCanvas.height);
         
-        if (heldPiece === null) return;
+        if (savedPiece === null) return;
         
-        const shape = SHAPES[heldPiece];
-        const blockSize = 18; // Reduced from 20
+        const shape = SHAPES[savedPiece];
+        const blockSize = 18;
         
         // Center the piece in the preview canvas
         const offsetX = (holdPieceCanvas.width - shape[0].length * blockSize) / 2;
@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 togglePause();
                 break;
             case 67: // C key - hold piece
-                if (!isPaused) holdPiece();
+                if (!isPaused) saveCurrentPiece();
                 break;
         }
     }
